@@ -1,6 +1,5 @@
 import yfinance as yf
 import pandas as pd
-import talib
 import matplotlib.pyplot as plt
 from telegram import Bot
 import datetime
@@ -17,13 +16,14 @@ TELEGRAM_CHAT_ID = '-1002284687068'
 bot = Bot(token=TELEGRAM_TOKEN)
 
 # Función para descargar y procesar datos de varios tickers
-def download_data(tickers, short_window, long_window):
+def download_data(tickers):
     ticker_data = {}
-    for ticker in tickers:
+    for ticker, (short_window, long_window) in tickers.items():
         try:
+            # Descargamos solo los datos necesarios
             data = yf.download(ticker, period='3mo')
-            data['SMA_short'] = talib.SMA(data['Close'], timeperiod=short_window)
-            data['SMA_long'] = talib.SMA(data['Close'], timeperiod=long_window)
+            data['SMA_short'] = data['Close'].rolling(window=short_window).mean()
+            data['SMA_long'] = data['Close'].rolling(window=long_window).mean()
             ticker_data[ticker] = data
         except Exception as e:
             print(f"Error descargando datos para {ticker}: {e}")
@@ -78,20 +78,24 @@ async def check_signals(data, ticker):
             message = f"🔴 Señal de VENTA para {ticker} - Precio actual: {last_close_price}"
             await send_telegram_message(message)
     else:
-        await send_telegram_message("No hay señales nuevas hoy")
+        await send_telegram_message(f"No hay señales nuevas hoy para {ticker}")
 
 # Función para ejecutar el bot
-async def run_bot(tickers, short_window, long_window):
-    ticker_data = download_data(tickers, short_window, long_window)
+async def run_bot(tickers):
+    ticker_data = download_data(tickers)
     for ticker, data in ticker_data.items():
         await check_signals(data, ticker)
 
 # Job programado
 def job():
-    tickers = ['AAPL', 'MSFT', 'GOOGL','BTC-USD','GGAL']
-    short_window = 20
-    long_window = 50
-    asyncio.run(run_bot(tickers, short_window, long_window))
+    tickers = {
+        'AAPL': (16, 45),  # Ventana corta y larga para AAPL
+        'MSFT': (37, 65),  # Ventana corta y larga para MSFT
+        'GOOGL': (19, 65),  # Ventana corta y larga para GOOGL
+        'GGAL' : (12,45),
+        'BTC-USD':(11,45),
+    }
+    asyncio.run(run_bot(tickers))
 
 # Configurar el timezone de Argentina
 argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
