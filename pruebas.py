@@ -101,7 +101,7 @@ def job():
 argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
 # Programar la tarea para que se ejecute a las 18:00 (hora de Argentina)
-schedule.every().day.at("18:25").do(job)
+schedule.every().day.at("18:40").do(job)
 
 # Ejecutar el loop del scheduler
 while True:
