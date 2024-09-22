@@ -102,7 +102,7 @@ schedule.every().day.at("18:00").do(job)
 # Ejecutar el loop del scheduler
 while True:
     schedule.run_pending()
-    time.sleep(1)
+    time.sleep(60)
 
 
 
