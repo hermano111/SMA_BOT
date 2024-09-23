@@ -9,8 +9,8 @@ import pytz
 import os
 
 # Configuración del bot de Telegram
-TELEGRAM_TOKEN = 'TU_TOKEN'
-TELEGRAM_CHAT_ID = 'TU_CHAT_ID'
+TELEGRAM_TOKEN = '7583734248:AAG6ee7QdfbFuQSWEYCL0NNMV5Omn3GpbL4'
+TELEGRAM_CHAT_ID = '-1002284687068'
 
 # Inicializar bot sincrónico
 bot = Bot(token=TELEGRAM_TOKEN)
