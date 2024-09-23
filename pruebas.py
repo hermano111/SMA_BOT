@@ -107,6 +107,9 @@ def job():
         'GOOGL': (19, 65),
         'GGAL': (12, 45),
         'BTC-USD': (11, 45),
+        'BIOX': (10, 40),
+        'GLOB':(39,95),
+        'ETH-USD':(36,60),
     }
     run_bot(tickers)
     print("Trabajo completado.")  # Log al finalizar el trabajo
