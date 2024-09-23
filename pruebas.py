@@ -102,7 +102,8 @@ def job():
         'GGAL' : (12,45),
         'BTC-USD':(11,45),
     }
-    asyncio.run(run_bot(tickers))
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_bot(tickers))  # Ejecuta el bot en el loop de eventos sin cerrarlo
     print("Trabajo completado.")  # Log al finalizar el trabajo
 
 # Ejecutar el trabajo cada 24 horas
@@ -114,6 +115,7 @@ while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
     time.sleep(60)
+
 
 
 
