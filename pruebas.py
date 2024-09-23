@@ -108,13 +108,13 @@ def job():
 
 # Ejecutar el trabajo cada 24 horas
 print("Programando el trabajo cada 24 horas...")  # Log de programación
-schedule.every(24).hours.do(job)
+schedule.every(10).seconds.do(job)
 
 # Ejecutar el loop del scheduler
 while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
-    time.sleep(60)
+    time.sleep(5)
 
 
 
