@@ -6,12 +6,11 @@ import datetime
 import time
 import schedule
 import pytz
-import asyncio
 import os
 
 # Configuración del bot de Telegram
-TELEGRAM_TOKEN = '7583734248:AAG6ee7QdfbFuQSWEYCL0NNMV5Omn3GpbL4'
-TELEGRAM_CHAT_ID = '-1002284687068'
+TELEGRAM_TOKEN = 'TU_TOKEN'
+TELEGRAM_CHAT_ID = 'TU_CHAT_ID'
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
@@ -31,12 +30,12 @@ def download_data(tickers):
     return ticker_data
 
 # Función para enviar mensajes y gráficos a Telegram
-async def send_telegram_message(message, photo_path=None):
+def send_telegram_message(message, photo_path=None):
     if photo_path:
         with open(photo_path, 'rb') as photo:
-            await bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=photo, caption=message)
+            bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=photo, caption=message)
     else:
-        await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 # Función para graficar rendimiento acumulado
 def plot_cumulative_performance(data, ticker):
@@ -54,7 +53,7 @@ def plot_cumulative_performance(data, ticker):
     return photo_path
 
 # Función para generar señales de compra y venta
-async def check_signals(data, ticker):
+def check_signals(data, ticker):
     data['Position'] = 0
     data['Position'] = data['SMA_short'] > data['SMA_long']
     data['Signal'] = data['Position'].diff()
@@ -67,7 +66,7 @@ async def check_signals(data, ticker):
     if last_signal == 1:  # Señal de compra
         message = f"🟢 Señal de COMPRA para {ticker} - Precio actual: {last_close_price}"
         print(f"Generando señal de compra para {ticker}...")  # Log de señal de compra
-        await send_telegram_message(message)
+        send_telegram_message(message)
     elif last_signal == -1:  # Señal de venta
         last_buy_price = data[data['Signal'] == 1]['Close'].iloc[-1] if not data[data['Signal'] == 1].empty else None
         if last_buy_price:
@@ -75,21 +74,21 @@ async def check_signals(data, ticker):
             message = f"🔴 Señal de VENTA para {ticker} - Precio actual: {last_close_price} - Rendimiento: {performance:.2f}%"
             print(f"Generando señal de venta para {ticker}...")  # Log de señal de venta
             photo_path = plot_cumulative_performance(data, ticker)  # Graficar rendimiento acumulado
-            await send_telegram_message(message, photo_path)  # Enviar mensaje y gráfico
+            send_telegram_message(message, photo_path)  # Enviar mensaje y gráfico
             os.remove(photo_path)  # Eliminar gráfico después de enviarlo
         else:
             message = f"🔴 Señal de VENTA para {ticker} - Precio actual: {last_close_price}"
-            await send_telegram_message(message)
+            send_telegram_message(message)
     else:
         print(f"No hay señales nuevas hoy para {ticker}.")  # Log de no señales
-        await send_telegram_message(f"No hay señales nuevas hoy para {ticker}")
+        send_telegram_message(f"No hay señales nuevas hoy para {ticker}")
 
 # Función para ejecutar el bot
-async def run_bot(tickers):
+def run_bot(tickers):
     print("Ejecutando el bot...")  # Log de inicio del bot
     ticker_data = download_data(tickers)
     for ticker, data in ticker_data.items():
-        await check_signals(data, ticker)
+        check_signals(data, ticker)
     print("Bot ejecutado con éxito.")  # Log de finalización del bot
 
 # Job programado
@@ -102,20 +101,21 @@ def job():
         'GGAL' : (12,45),
         'BTC-USD':(11,45),
     }
-    loop = asyncio.get_event_loop()
-    loop.create_task(run_bot(tickers))  # Ejecuta el bot en el loop de eventos sin cerrarlo
+    run_bot(tickers)
     print("Trabajo completado.")  # Log al finalizar el trabajo
 
-# Ejecutar el trabajo cada 24 horas
-print("Programando el trabajo cada 24 horas...")  # Log de programación
-schedule.every(10).seconds.do(job)
+# Configurar el timezone de Argentina
+argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
+
+# Programar la tarea para que se ejecute cada 24 horas
+print("Programando el trabajo...")  # Log de programación
+schedule.every(24).hours.do(job)
 
 # Ejecutar el loop del scheduler
 while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
-    time.sleep(5)
-
+    time.sleep(60)
 
 
 
