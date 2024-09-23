@@ -12,7 +12,9 @@ import os
 TELEGRAM_TOKEN = 'TU_TOKEN'
 TELEGRAM_CHAT_ID = 'TU_CHAT_ID'
 
+# Inicializar bot sincrónico
 bot = Bot(token=TELEGRAM_TOKEN)
+
 
 # Función para descargar y procesar datos de varios tickers
 def download_data(tickers):
@@ -29,6 +31,7 @@ def download_data(tickers):
             print(f"Error descargando datos para {ticker}: {e}")
     return ticker_data
 
+
 # Función para enviar mensajes y gráficos a Telegram
 def send_telegram_message(message, photo_path=None):
     if photo_path:
@@ -36,6 +39,7 @@ def send_telegram_message(message, photo_path=None):
             bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=photo, caption=message)
     else:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+
 
 # Función para graficar rendimiento acumulado
 def plot_cumulative_performance(data, ticker):
@@ -51,6 +55,7 @@ def plot_cumulative_performance(data, ticker):
     plt.savefig(photo_path)
     plt.close()
     return photo_path
+
 
 # Función para generar señales de compra y venta
 def check_signals(data, ticker):
@@ -83,6 +88,7 @@ def check_signals(data, ticker):
         print(f"No hay señales nuevas hoy para {ticker}.")  # Log de no señales
         send_telegram_message(f"No hay señales nuevas hoy para {ticker}")
 
+
 # Función para ejecutar el bot
 def run_bot(tickers):
     print("Ejecutando el bot...")  # Log de inicio del bot
@@ -91,6 +97,7 @@ def run_bot(tickers):
         check_signals(data, ticker)
     print("Bot ejecutado con éxito.")  # Log de finalización del bot
 
+
 # Job programado
 def job():
     print("Ejecutando el trabajo programado...")  # Log al iniciar el trabajo
@@ -98,11 +105,12 @@ def job():
         'AAPL': (16, 45),
         'MSFT': (37, 65),
         'GOOGL': (19, 65),
-        'GGAL' : (12,45),
-        'BTC-USD':(11,45),
+        'GGAL': (12, 45),
+        'BTC-USD': (11, 45),
     }
     run_bot(tickers)
     print("Trabajo completado.")  # Log al finalizar el trabajo
+
 
 # Configurar el timezone de Argentina
 argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
@@ -116,7 +124,6 @@ while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
     time.sleep(5)
-
 
 
 
