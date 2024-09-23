@@ -109,7 +109,7 @@ argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
 # Programar la tarea para que se ejecute cada 24 horas
 print("Programando el trabajo...")  # Log de programación
-schedule.every(10).hours.do(job)
+schedule.every(10).seconds.do(job)
 
 # Ejecutar el loop del scheduler
 while True:
