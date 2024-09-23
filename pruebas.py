@@ -105,18 +105,16 @@ def job():
     asyncio.run(run_bot(tickers))
     print("Trabajo completado.")  # Log al finalizar el trabajo
 
-# Configurar el timezone de Argentina
-argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
-
-# Programar la tarea para que se ejecute a las 19:00 (hora de Argentina)
-print("Programando el trabajo...")  # Log de programación
-schedule.every().day.at("22:16").do(job)
+# Ejecutar el trabajo cada 24 horas
+print("Programando el trabajo cada 24 horas...")  # Log de programación
+schedule.every(24).hours.do(job)
 
 # Ejecutar el loop del scheduler
 while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
     time.sleep(60)
+
 
 
 
