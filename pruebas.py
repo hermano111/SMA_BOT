@@ -22,7 +22,7 @@ def download_data(tickers):
     for ticker, (short_window, long_window) in tickers.items():
         try:
             print(f"Descargando datos para {ticker}...")  # Log de descarga de datos
-            data = yf.download(ticker, period='3mo')
+            data = yf.download(ticker, period='6mo')
             data['SMA_short'] = data['Close'].rolling(window=short_window).mean()
             data['SMA_long'] = data['Close'].rolling(window=long_window).mean()
             ticker_data[ticker] = data
@@ -120,7 +120,7 @@ argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
 # Programar la tarea para que se ejecute cada 24 horas
 print("Programando el trabajo...")  # Log de programación
-schedule.every(24).hours.do(job)
+schedule.every(12).hours.do(job)
 
 # Ejecutar el loop del scheduler
 while True:
