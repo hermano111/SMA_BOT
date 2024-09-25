@@ -60,7 +60,7 @@ def plot_cumulative_performance(data, ticker):
 # Función para generar señales de compra y venta
 def check_signals(data, ticker):
     data['Position'] = 0
-    data['Position'] = data['SMA_short'] > data['SMA_long']
+    data['Position'] = (data['SMA_short'] > data['SMA_long']).astype(int)
     data['Signal'] = data['Position'].diff()
 
     data['Return'] = data['Close'].pct_change()  # Rendimiento diario
@@ -126,7 +126,7 @@ schedule.every(12).hours.do(job)
 while True:
     print("Esperando la próxima tarea...")  # Log de espera antes de la próxima tarea
     schedule.run_pending()
-    time.sleep(3600)
+    time.sleep(60)
 
 
 
