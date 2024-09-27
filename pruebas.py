@@ -12,9 +12,8 @@ import os
 TELEGRAM_TOKEN = '7583734248:AAG6ee7QdfbFuQSWEYCL0NNMV5Omn3GpbL4'
 TELEGRAM_CHAT_ID = '-1002284687068'
 
-# Inicializar bot sincrónico
-bot = Bot(token=TELEGRAM_TOKEN)
-
+# Inicializar bot sincrónico con un timeout mayor
+bot = Bot(token=TELEGRAM_TOKEN, request_kwargs={'read_timeout': 10, 'connect_timeout': 10})
 
 # Función para descargar y procesar datos de varios tickers
 def download_data(tickers):
@@ -31,15 +30,16 @@ def download_data(tickers):
             print(f"Error descargando datos para {ticker}: {e}")
     return ticker_data
 
-
 # Función para enviar mensajes y gráficos a Telegram
 def send_telegram_message(message, photo_path=None):
-    if photo_path:
-        with open(photo_path, 'rb') as photo:
-            bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=photo, caption=message)
-    else:
-        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-
+    try:
+        if photo_path:
+            with open(photo_path, 'rb') as photo:
+                bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=photo, caption=message)
+        else:
+            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+    except Exception as e:
+        print(f"Error al enviar mensaje a Telegram: {e}")
 
 # Función para graficar rendimiento acumulado
 def plot_cumulative_performance(data, ticker):
@@ -55,7 +55,6 @@ def plot_cumulative_performance(data, ticker):
     plt.savefig(photo_path)
     plt.close()
     return photo_path
-
 
 # Función para generar señales de compra y venta
 def check_signals(data, ticker):
@@ -88,7 +87,6 @@ def check_signals(data, ticker):
         print(f"No hay señales nuevas hoy para {ticker}.")  # Log de no señales
         send_telegram_message(f"No hay señales nuevas hoy para {ticker}")
 
-
 # Función para ejecutar el bot
 def run_bot(tickers):
     print("Ejecutando el bot...")  # Log de inicio del bot
@@ -96,7 +94,6 @@ def run_bot(tickers):
     for ticker, data in ticker_data.items():
         check_signals(data, ticker)
     print("Bot ejecutado con éxito.")  # Log de finalización del bot
-
 
 # Job programado
 def job():
@@ -114,11 +111,10 @@ def job():
     run_bot(tickers)
     print("Trabajo completado.")  # Log al finalizar el trabajo
 
-
 # Configurar el timezone de Argentina
 argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
-# Programar la tarea para que se ejecute cada 24 horas
+# Programar la tarea para que se ejecute cada 12 horas
 print("Programando el trabajo...")  # Log de programación
 schedule.every(12).hours.do(job)
 
