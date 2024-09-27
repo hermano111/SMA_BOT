@@ -12,8 +12,8 @@ import os
 TELEGRAM_TOKEN = '7583734248:AAG6ee7QdfbFuQSWEYCL0NNMV5Omn3GpbL4'
 TELEGRAM_CHAT_ID = '-1002284687068'
 
-# Inicializar bot sincrónico con un timeout mayor
-bot = Bot(token=TELEGRAM_TOKEN, request_kwargs={'read_timeout': 10, 'connect_timeout': 10})
+# Inicializar bot sincrónico
+bot = Bot(token=TELEGRAM_TOKEN)
 
 # Función para descargar y procesar datos de varios tickers
 def download_data(tickers):
@@ -40,6 +40,7 @@ def send_telegram_message(message, photo_path=None):
             bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception as e:
         print(f"Error al enviar mensaje a Telegram: {e}")
+        time.sleep(5)  # Esperar 5 segundos antes de intentar de nuevo
 
 # Función para graficar rendimiento acumulado
 def plot_cumulative_performance(data, ticker):
